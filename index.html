@@ -905,18 +905,38 @@
             </label>
             <div class="grid grid-cols-2 gap-3">
               <label class="cursor-pointer">
-                <input type="radio" name="attendance" value="accept" checked class="peer sr-only">
+                <input type="radio" name="attendance" value="accept" checked onchange="handleAttendanceChange(this.value)" class="peer sr-only">
                 <div class="p-3 rounded-2xl border-2 border-rose-100 bg-ivory peer-checked:bg-rose-50 peer-checked:border-rose text-center transition-all">
                   <span class="text-sm font-semibold text-plum peer-checked:text-rose">Joyfully Accept ❤️</span>
                 </div>
               </label>
 
               <label class="cursor-pointer">
-                <input type="radio" name="attendance" value="decline" class="peer sr-only">
+                <input type="radio" name="attendance" value="decline" onchange="handleAttendanceChange(this.value)" class="peer sr-only">
                 <div class="p-3 rounded-2xl border-2 border-rose-100 bg-ivory peer-checked:bg-gray-100 peer-checked:border-gray-400 text-center transition-all">
                   <span class="text-sm font-semibold text-plum peer-checked:text-gray-600">Regretfully Decline</span>
                 </div>
               </label>
+            </div>
+          </div>
+
+          <!-- Number of Guests Attending -->
+          <div id="guest-count-container" class="transition-all duration-300">
+            <label for="guest-party-size" class="block text-xs font-bold uppercase tracking-wider text-plum mb-2">
+              Number of Guests Attending <span class="text-rose">*</span>
+            </label>
+            <div class="relative">
+              <select id="guest-party-size" class="w-full px-4 py-3 rounded-2xl border border-rose-200 bg-ivory focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose/50 text-sm text-plum transition-all appearance-none cursor-pointer">
+                <option value="1">1 Guest (Solo)</option>
+                <option value="2" selected>2 Guests (With Plus-One / Partner)</option>
+                <option value="3">3 Guests (With Family)</option>
+                <option value="4">4 Guests (Family)</option>
+                <option value="5">5 Guests (Family)</option>
+                <option value="6">6+ Guests (Family Group)</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-plum/60">
+                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
             </div>
           </div>
 
@@ -1428,41 +1448,112 @@
     });
 
     // ------------------------------------------
-    // 7. RSVP Handling & LocalStorage Management
+    // 7. Live Google Sheets RSVP Handling & Local Backup
     // ------------------------------------------
-    function handleRSVP(e) {
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyb9HN-DzJ1iPmUndj1_G07hNMetiTJI5rbzo4zCO1HLRyq_6VzpI7QdylO2jy0RrMtdQ/exec";
+
+    function handleAttendanceChange(value) {
+      const container = document.getElementById('guest-count-container');
+      if (container) {
+        if (value === 'decline') {
+          container.classList.add('opacity-40', 'pointer-events-none');
+        } else {
+          container.classList.remove('opacity-40', 'pointer-events-none');
+        }
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    async function handleRSVP(e) {
       e.preventDefault();
+      const submitBtn = document.getElementById('rsvp-submit-btn');
+      const originalBtnHtml = submitBtn.innerHTML;
+
       const name = document.getElementById('guest-name').value.trim();
       const mobile = document.getElementById('guest-mobile').value.trim();
-      const attendance = document.querySelector('input[name="attendance"]:checked').value;
+      const attendanceInput = document.querySelector('input[name="attendance"]:checked');
+      const isAccepting = attendanceInput ? attendanceInput.value === 'accept' : true;
+      const attendance = isAccepting ? 'Joyfully Accept ❤️' : 'Regretfully Decline';
+      
+      const partySizeSelect = document.getElementById('guest-party-size');
+      const guests = isAccepting ? (partySizeSelect ? partySizeSelect.value : '1') : '0';
       const message = document.getElementById('guest-message').value.trim();
 
       const newEntry = {
         name,
         mobile,
-        attendance: attendance === 'accept' ? 'Joyfully Accept ❤️' : 'Regretfully Decline',
+        attendance,
+        guests,
         message,
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
       };
 
-      const existing = JSON.parse(localStorage.getItem('shivam_kajal_rsvps') || '[]');
-      existing.push(newEntry);
-      localStorage.setItem('shivam_kajal_rsvps', JSON.stringify(existing));
+      // Loading state on button
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 size-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>Saving Your RSVP... ❤️</span>
+      `;
 
-      // Show success animation
-      document.getElementById('rsvp-form').classList.add('hidden');
-      document.getElementById('rsvp-success').classList.remove('hidden');
+      try {
+        if (GOOGLE_SCRIPT_URL) {
+          await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify(newEntry)
+          });
+        }
 
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.7 },
-        colors: ['#D94E68', '#DFB85E', '#FAE8EB']
-      });
+        // Keep local backup for device reference
+        const existing = JSON.parse(localStorage.getItem('shivam_kajal_rsvps') || '[]');
+        existing.push(newEntry);
+        localStorage.setItem('shivam_kajal_rsvps', JSON.stringify(existing));
+
+        // Personalized thank you confirmation
+        const successMsg = document.getElementById('rsvp-success-msg');
+        if (successMsg) {
+          if (isAccepting) {
+            successMsg.innerHTML = `Thank you, <strong class="text-rose font-semibold">${escapeHtml(name)}</strong>! Your RSVP for <strong>${guests} guest${guests > 1 ? 's' : ''}</strong> has been joyfully recorded. Shivam & Kajal cannot wait to celebrate with you in Mumbai!`;
+          } else {
+            successMsg.innerHTML = `Thank you, <strong class="text-rose font-semibold">${escapeHtml(name)}</strong>. We will miss you at the celebrations, but we warmly cherish your love and blessings!`;
+          }
+        }
+
+        // Show success animation
+        document.getElementById('rsvp-form').classList.add('hidden');
+        document.getElementById('rsvp-success').classList.remove('hidden');
+
+        confetti({
+          particleCount: 120,
+          spread: 85,
+          origin: { y: 0.7 },
+          colors: ['#D94E68', '#DFB85E', '#FAE8EB', '#4A1525']
+        });
+      } catch (error) {
+        console.error('Error submitting RSVP:', error);
+        alert('There was a slight delay reaching the RSVP sheet. Please check your connection and try again.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
     }
 
     function resetRSVPForm() {
       document.getElementById('rsvp-form').reset();
+      const container = document.getElementById('guest-count-container');
+      if (container) container.classList.remove('opacity-40', 'pointer-events-none');
       document.getElementById('rsvp-form').classList.remove('hidden');
       document.getElementById('rsvp-success').classList.add('hidden');
     }
@@ -1482,20 +1573,26 @@
       countSpan.innerText = rsvps.length;
 
       if (rsvps.length === 0) {
-        listContainer.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">No RSVPs recorded yet.</p>';
+        listContainer.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">No RSVPs recorded yet on this device.</p>';
         return;
       }
 
-      listContainer.innerHTML = rsvps.map((r, i) => `
-        <div class="p-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-start justify-between text-xs">
-          <div>
-            <div class="font-bold text-plum">${r.name} (${r.mobile})</div>
-            <div class="text-rose font-medium mt-0.5">${r.attendance}</div>
-            ${r.message ? `<div class="text-gray-600 italic mt-1">"${r.message}"</div>` : ''}
+      listContainer.innerHTML = rsvps.map((r) => {
+        const maskedMobile = r.mobile && r.mobile.length >= 4 
+          ? r.mobile.slice(0, 2) + '••••••' + r.mobile.slice(-2) 
+          : '••••';
+        const guestInfo = r.guests && r.guests !== '0' ? ` · ${r.guests} guest${r.guests > 1 ? 's' : ''}` : '';
+        return `
+          <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex items-start justify-between text-xs gap-3">
+            <div class="space-y-1">
+              <div class="font-bold text-plum text-sm">${escapeHtml(r.name)} <span class="text-[11px] font-normal text-gray-500">(${maskedMobile}${guestInfo})</span></div>
+              <div class="text-rose font-medium">${escapeHtml(r.attendance)}</div>
+              ${r.message ? `<div class="text-gray-600 italic bg-white/70 p-2 rounded-xl border border-rose-100/60 mt-1">"${escapeHtml(r.message)}"</div>` : ''}
+            </div>
+            <span class="text-[10px] text-gray-400 whitespace-nowrap">${escapeHtml(r.date)}</span>
           </div>
-          <span class="text-[10px] text-gray-400">${r.date}</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // ------------------------------------------

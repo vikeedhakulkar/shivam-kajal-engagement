@@ -62,7 +62,22 @@ engagement-website/
 
 ---
 
-## 🌐 Free 1-Click Deployment
+## 💌 Live Google Sheets RSVP Backend
+The website is connected to a live Google Sheet via a Google Apps Script Web App:
+- **Webhook Endpoint:** Configured in `index.html` (`GOOGLE_SCRIPT_URL`)
+- **Row Columns:** `Timestamp (IST)`, `Guest Name`, `Mobile Number`, `Attending`, `Guests`, `Personal Message`
+- **Features:** 
+  - Real-time guest recording directly into Shivam & Kajal's Google Drive.
+  - Zero database pausing/sleeping (100% online up to December 2026).
+  - Built-in loading spinner, guest count selector (1–6+), personalized confirmation message, and celebratory confetti.
+  - Privacy-preserving guest list modal with phone number masking (`98••••••10`).
+
+---
+
+## 🌐 Free 1-Click Deployment (Vercel & GitHub)
 To share this website with guests on WhatsApp, Instagram, or email:
-- **GitHub Pages**: Push this folder to a GitHub repository, enable GitHub Pages in Repository Settings -> Pages, and it will be live immediately.
-- **Vercel / Netlify / Cloudflare Pages**: Drag and drop the `engagement-website` folder directly into Vercel or Netlify to get a free live URL (e.g. `shivam-kajal-engagement.vercel.app`).
+- **Vercel (Recommended)**: 
+  1. Import the `shivam-kajal-engagement` repository on [vercel.com](https://vercel.com).
+  2. If deploying from the root repository, set **Root Directory** to `engagement-website` (or leave default if the repository root contains `index.html`).
+  3. Deploy! Vercel automatically deploys static assets with configured `vercel.json` routing.
+- **GitHub Pages**: Push this folder to your GitHub repository, enable GitHub Pages in Repository Settings -> Pages, and it will be live immediately.
