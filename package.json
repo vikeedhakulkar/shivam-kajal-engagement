@@ -1,0 +1,15 @@
+{
+  "name": "shivam-kajal-engagement",
+  "version": "1.0.0",
+  "description": "Engagement celebration website for Shivam & Kajal · 13 December 2026, Mumbai",
+  "scripts": {
+    "start": "npx serve -l 3000 ."
+  },
+  "keywords": [
+    "engagement-invitation",
+    "wedding-website",
+    "shivam-kajal"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
