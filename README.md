@@ -13,13 +13,13 @@ This web application is a faithful, enhanced reconstruction based on the design 
 3. **Royal Arch Hero**: 3D Pixar/Disney style couple illustration framed with gold arch, floral borders, floating heart stickers, and a shimmering "Enter Our Engagement World" CTA button.
 4. **Floating Rose Petals Engine**: Canvas-based continuous drifting and fluttering rose petals.
 5. **Interactive Gold Scratch Card**: Realistic gold foil canvas that guests can scratch using touch or mouse cursor to reveal the date announcement and trigger a festive confetti explosion.
-6. **Live Countdown Timer**: Real-time ticker counting down days, hours, minutes, and seconds to **13 December 2026, 5:30 PM IST**.
+6. **Live Countdown Timer**: Real-time ticker counting down days, hours, minutes, and seconds to **13 December 2026, 10:30 AM IST**.
 7. **Our Story Polaroid Timeline**: Milestone line with tilted polaroids, washi tape accents, and cursive captions detailing Chapter 1 (*The Beginning*), Chapter 2 (*The Proposal*), and Chapter 3 (*Forever Starts Here*).
-8. **Engagement Functions Grid**:
-   - **Function 01**: Mehendi & High Tea (11:00 AM onwards)
-   - **Function 02**: Sagai & Ring Ceremony (5:30 PM)
-   - **Function 03**: Musical Sangeet & Cocktails (7:30 PM onwards)
-   - **Function 04**: Swadisht Bhoj & Celebration Feast (8:30 PM – 11:30 PM)
+8. **Daytime Engagement Functions Grid (Traditional Sagai)**:
+   - **Function 01**: Swagat & Refreshments — Floral welcome with bouquet greeting (10:30 AM onwards)
+   - **Function 02**: Puja, Tilak & Ring Ceremony — Sacred rituals & diamond rings (11:45 AM)
+   - **Function 03**: Shagun, Aashirwad & Sangeet — Blessings, family dances & music (1:00 PM onwards)
+   - **Function 04**: Shahi Bhoj & Royal Feast — Grand afternoon culinary feast (1:45 PM – 4:30 PM)
 9. **Photo Gallery & Lightbox**: Interactive grid of moments with full-screen lightbox modal and arrow key navigation.
 10. **RSVP Form with Local Persistence**: Instant guest RSVP submission, celebratory confetti, and a built-in guest list viewer for the couple.
 11. **Venue & Directions**: Embedded Google Maps with one-click "Get Directions" and "Open in Maps" buttons for Mumbai.
@@ -45,19 +45,19 @@ Then visit `http://localhost:3000` in your browser.
 ## 🎨 Asset Structure
 ```
 engagement-website/
-├── index.html                  # Main interactive application
-├── package.json                # Project configuration & start script
-├── README.md                   # Documentation & guide
-└── assets/                     # High-resolution 3D illustrations
-    ├── couple-hero.jpg         # Hero royal portrait
-    ├── couple-carnival.jpg     # Function 1 (Mehendi Carnival)
-    ├── couple-chakbhat.jpg     # Function 2 (Sagai & Blessings)
-    ├── couple-reception.jpg    # Function 3 (Musical Sangeet)
-    ├── couple-wedding.jpg      # Function 4 (Celebration Feast)
-    ├── story-beginning.jpg     # Chapter 1 (Where it began)
-    ├── story-moment.jpg        # Chapter 2 (She said yes!)
-    ├── story-forever.jpg       # Chapter 3 (13.12.2026)
-    └── couple-wave.jpg         # Footer waving avatar
+├── index.html                     # Main interactive application
+├── package.json                   # Project configuration & start script
+├── README.md                      # Documentation & guide
+└── assets/                        # High-resolution 3D illustrations
+    ├── couple-hero.jpg            # Hero royal portrait
+    ├── couple-bouquet-welcome.jpg # Function 01 (Swagat & Bouquet Greeting)
+    ├── couple-ring-ceremony.jpg   # Function 02 (Sagai & Ring Exchange)
+    ├── couple-reception.jpg       # Function 03 (Sangeet & Celebrations)
+    ├── couple-engagement-feast.jpg# Function 04 (Shahi Bhoj & Feast)
+    ├── story-beginning.jpg        # Chapter 1 (Where it began)
+    ├── story-moment.jpg           # Chapter 2 (She said yes!)
+    ├── story-forever.jpg          # Chapter 3 (13.12.2026)
+    └── couple-wave.jpg            # Footer waving avatar
 ```
 
 ---
